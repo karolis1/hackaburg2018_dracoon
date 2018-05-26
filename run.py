@@ -14,9 +14,15 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--results_file', type=str, default='predicted_tags', help='Predicted tags')
     parser.add_argument('-m', '--method', type=str, choices=['rake', 'gensim', 'keras'],
                         help='Keyword extraction method')
+    parser.add_argument('-u', '--use_cache', type=bool, default=True, help='Use cache?')
+    parser.add_argument('-c', '--cache_file', type=str, default='id_to_text.pkl', help='Cache file')
+
+
 
     args = parser.parse_args()
 
+    if args.use_cache:
+        text_cache = pickle.load(open(args.cache_file, 'rb'))
     if args.redownload:
         download_all()
 
@@ -25,13 +31,16 @@ if __name__ == "__main__":
     broken_files = 0
     broken_file_list = []
 
-    for _, filename, golden_tags in tqdm.tqdm(labelled_data):
-        try:
-            text = extract_text(os.path.join(args.data_folder, filename))
-        except:
-            text = ''
-            print("WARNING: {} failed to parse text".format(filename))
-            broken_file_list.append(filename)
+    for node_id, filename, golden_tags in tqdm.tqdm(labelled_data):
+        if args.use_cache:
+            text = text_cache[node_id] or ''
+        else:
+            try:
+                text = extract_text(os.path.join(args.data_folder, filename))
+            except:
+                text = ''
+                print("WARNING: {} failed to parse text".format(filename))
+                broken_file_list.append(filename)
 
         predicted_tags = selectkeywords(text)
 
@@ -40,9 +49,6 @@ if __name__ == "__main__":
         print("PREDICTED:")
         print(predicted_tags[:15])
         print("\n---\n")
-    print("BROKEN FILE COUNT: {}".format(len(broken_file_list)))
-    print(broken_file_list)
-
 
     if args.results_file:
         pass
