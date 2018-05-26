@@ -108,4 +108,5 @@ def download_all():
         download_node(node, filename)
 
 
-download_all()
+if __name__ == "__main__":
+    download_all()
