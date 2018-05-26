@@ -4,8 +4,10 @@ import os
 import tqdm
 
 from download_files import download_all
-from preprocessing.text_extraction import extract_text
+from preprocessing.text_extraction import extract_text, preprocess_text
 from selectkeywords import selectkeywords
+from gensim.summarization import keywords
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tag generator for Dracoon challenge, hackaburg2018')
@@ -16,10 +18,12 @@ if __name__ == "__main__":
                         help='Keyword extraction method')
     parser.add_argument('-u', '--use_cache', type=bool, default=True, help='Use cache?')
     parser.add_argument('-c', '--cache_file', type=str, default='id_to_text.pkl', help='Cache file')
-
-
+    parser.add_argument('-p', '--use_preprocessing', type=bool, default=True, help='Use text preprocessing?')
 
     args = parser.parse_args()
+    
+    assert (args.method is not None)
+    print('Using method:', args.method)
 
     if args.use_cache:
         text_cache = pickle.load(open(args.cache_file, 'rb'))
@@ -42,7 +46,13 @@ if __name__ == "__main__":
                 print("WARNING: {} failed to parse text".format(filename))
                 broken_file_list.append(filename)
 
-        predicted_tags = selectkeywords(text)
+        if args.use_preprocessing:
+            text = preprocess_text(text)
+
+        if args.method == 'rake':
+            predicted_tags = selectkeywords(text)
+        elif args.method == 'gensim':
+            predicted_tags = keywords(text).split('\n')
 
         print("GOLD:")
         print(golden_tags)

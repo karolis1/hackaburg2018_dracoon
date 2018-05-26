@@ -4,3 +4,4 @@ chardet
 pyyaml
 nltk
 rake_nltk
+gensim

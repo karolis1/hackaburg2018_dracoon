@@ -1,5 +1,9 @@
 import textract
 import chardet
+import re
+from nltk.corpus import stopwords
+
+STOP_WORDS = set(stopwords.words('german'))
 
 
 def extract_text(filename):
@@ -14,3 +18,12 @@ def extract_text(filename):
                 return rawdata.decode(charenc)
     else:
         return textract.process(filename).decode()
+
+
+def preprocess_text(text):
+    text = text.lower()
+    text = re.sub('\d', '', text)
+    text = re.sub('[^\w]', ' ', text)
+    tokens = text.split()
+    tokens = [token for token in tokens if token not in STOP_WORDS]
+    return ' '.join(tokens)
