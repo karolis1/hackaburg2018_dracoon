@@ -1,3 +1,4 @@
 textract
 tqdm
 chardet
+pyyaml

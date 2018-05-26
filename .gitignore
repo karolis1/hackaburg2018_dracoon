@@ -26,6 +26,7 @@ wheels/
 MANIFEST
 
 .idea/
+download_meta.pickle
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

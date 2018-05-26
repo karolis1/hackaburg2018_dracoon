@@ -98,7 +98,7 @@ def find_nodes(root):
 def download_all():
     root = 'Tagged Documents'
     nodes_filenames_tags = find_nodes(root)
-
+    os.makedirs('data', exist_ok=True)
     pickle.dump(nodes_filenames_tags, open('download_meta.pickle', 'wb'))
 
     for node, filename, _ in tqdm.tqdm(nodes_filenames_tags):
