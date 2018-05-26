@@ -61,12 +61,15 @@ def listify_tags(tag_string):
 
 
 def download_node(node_id, local, storage_folder='data/'):
+    local_filepath = os.path.join(storage_folder, local)
+    if os.path.exists(local_filepath):
+        return
     api = f"/nodes/files/{node_id}/downloads"
     url = f"{conf['url']}{path}{api}"
     headers = {'X-Sds-Auth-Token': token}
     res = requests.get(url, headers=headers, stream=True)
     res.raw.decode_content = True
-    with open(storage_folder + local, 'wb') as f:
+    with open(local_filepath, 'wb') as f:
         shutil.copyfileobj(res.raw, f)
 
 
