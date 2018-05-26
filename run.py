@@ -4,10 +4,13 @@ import os
 import tqdm
 
 from download_files import download_all
+from evaluate_measure import aligned_tag_score
 from preprocessing.text_extraction import extract_text, preprocess_text
 from selectkeywords import selectkeywords
 from gensim.summarization import keywords
 from postprocess_tags import postprocess_tags
+
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -15,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--redownload', type=bool, default=True, help='Redownload missing files')
     parser.add_argument('-d', '--data_folder', type=str, default='data', help='Data file folder',)
     parser.add_argument('-f', '--results_file', type=str, default='predicted_tags', help='Predicted tags')
-    parser.add_argument('-m', '--method', type=str, choices=['rake', 'gensim', 'keras'],
+    parser.add_argument('-m', '--method', type=str, required=True, choices=['rake', 'gensim', 'keras'],
                         help='Keyword extraction method')
     parser.add_argument('-u', '--use_cache', type=bool, default=True, help='Use cache?')
     parser.add_argument('-c', '--cache_file', type=str, default='id_to_text.pkl', help='Cache file')
@@ -23,7 +26,6 @@ if __name__ == "__main__":
     parser.add_argument('-pp', '--use_postprocessing', type=bool, default=True, help='Postprocess tags')
     args = parser.parse_args()
 
-    assert (args.method is not None)
     print('Using method:', args.method)
 
     if args.use_cache:
@@ -35,6 +37,8 @@ if __name__ == "__main__":
 
     broken_files = 0
     broken_file_list = []
+
+    doc_scores = []
 
     for node_id, filename, golden_tags in tqdm.tqdm(labelled_data):
         if args.use_cache:
@@ -58,11 +62,19 @@ if __name__ == "__main__":
         if args.use_postprocessing:
             predicted_tags = postprocess_tags(predicted_tags)
 
+        doc_scores.append(aligned_tag_score(predicted_tags[:15], golden_tags))
+
         print("GOLD:")
         print(golden_tags)
         print("PREDICTED:")
         print(predicted_tags[:15])
+        print("QUALITY: {}".format(doc_scores[-1]))
         print("\n---\n")
+
+
+    eval_metric = np.average(doc_scores)
+
+    print("Final EVAL score: {}".format(eval_metric))
 
     if args.results_file:
         pass
