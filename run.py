@@ -7,6 +7,7 @@ from download_files import download_all
 from preprocessing.text_extraction import extract_text, preprocess_text
 from selectkeywords import selectkeywords
 from gensim.summarization import keywords
+from postprocess_tags import postprocess_tags
 
 
 if __name__ == "__main__":
@@ -19,9 +20,9 @@ if __name__ == "__main__":
     parser.add_argument('-u', '--use_cache', type=bool, default=True, help='Use cache?')
     parser.add_argument('-c', '--cache_file', type=str, default='id_to_text.pkl', help='Cache file')
     parser.add_argument('-p', '--use_preprocessing', type=bool, default=True, help='Use text preprocessing?')
-
+    parser.add_argument('-pp', '--use_postprocessing', type=bool, default=True, help='Postprocess tags')
     args = parser.parse_args()
-    
+
     assert (args.method is not None)
     print('Using method:', args.method)
 
@@ -53,6 +54,9 @@ if __name__ == "__main__":
             predicted_tags = selectkeywords(text)
         elif args.method == 'gensim':
             predicted_tags = keywords(text).split('\n')
+
+        if args.use_postprocessing:
+            predicted_tags = postprocess_tags(predicted_tags)
 
         print("GOLD:")
         print(golden_tags)
