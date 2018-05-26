@@ -2,3 +2,5 @@ textract
 tqdm
 chardet
 pyyaml
+nltk
+rake_nltk
