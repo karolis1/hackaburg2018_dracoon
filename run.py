@@ -61,7 +61,12 @@ if __name__ == "__main__":
             if args.method == 'rake':
                 predicted_tags = selectkeywords(text)
             elif args.method == 'gensim':
-                predicted_tags = keywords(text).split('\n')
+                try:
+                    predicted_tags = keywords(text).split('\n')
+                except Exception as e:
+                    print('Error!', e)
+                    doc_scores.append(0)
+                    continue
             elif args.method == 'word2vec':
                 predicted_tags = word2vec_keywords.extract_keywords(text)
 
