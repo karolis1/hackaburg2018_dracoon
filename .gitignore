@@ -27,6 +27,7 @@ MANIFEST
 
 .idea/
 download_meta.pickle
+german.model
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 import numpy as np
 import pickle
 
-id2txt = pickle.load(open("C:\\Users\\Samsung\\Documents\\GitHub\\hackaburg2018_dracoon\\id_to_text.pkl", "rb"))
+id2txt = pickle.load(open("id_to_text.pkl", "rb"))
 text_review = list(id2txt.values())[0]
 
 # =============================================================================

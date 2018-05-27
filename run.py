@@ -9,7 +9,7 @@ from preprocessing.text_extraction import extract_text, preprocess_text
 from selectkeywords import selectkeywords
 from gensim.summarization import keywords
 from postprocess_tags import postprocess_tags
-
+import word2vec_keywords
 import numpy as np
 
 
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--redownload', type=bool, default=True, help='Redownload missing files')
     parser.add_argument('-d', '--data_folder', type=str, default='data', help='Data file folder',)
     parser.add_argument('-f', '--results_file', type=str, default='predicted_tags', help='Predicted tags')
-    parser.add_argument('-m', '--method', type=str, required=True, choices=['rake', 'gensim', 'keras'],
+    parser.add_argument('-m', '--method', type=str, required=True, choices=['rake', 'gensim', 'keras', 'word2vec'],
                         help='Keyword extraction method')
     parser.add_argument('-u', '--use_cache', type=bool, default=True, help='Use cache?')
     parser.add_argument('-c', '--cache_file', type=str, default='id_to_text.pkl', help='Cache file')
@@ -58,6 +58,8 @@ if __name__ == "__main__":
             predicted_tags = selectkeywords(text)
         elif args.method == 'gensim':
             predicted_tags = keywords(text).split('\n')
+        elif args.method == 'word2vec':
+            predicted_tags = word2vec_keywords.extract_keywords(text)
 
         if args.use_postprocessing:
             predicted_tags = postprocess_tags(predicted_tags)
@@ -75,6 +77,8 @@ if __name__ == "__main__":
     eval_metric = np.average(doc_scores)
 
     print("Final EVAL score: {}".format(eval_metric))
+
+
 
     if args.results_file:
         pass
